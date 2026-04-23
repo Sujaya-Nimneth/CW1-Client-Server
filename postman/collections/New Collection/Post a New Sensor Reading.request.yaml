@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/sensors/TEMP-001/readings
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "value": 23.7
+    }
+order: 4503597608494423

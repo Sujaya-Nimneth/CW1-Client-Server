@@ -1,0 +1,7 @@
+$kind: http-request
+name: List Sensors Filtered by Type
+url: http://localhost:8080/api/v1/sensors?type=Temperature
+method: GET
+queryParams:
+  type: Temperature
+order: 4503596961863652

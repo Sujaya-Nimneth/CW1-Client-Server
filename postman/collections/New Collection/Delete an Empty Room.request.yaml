@@ -1,0 +1,5 @@
+$kind: http-request
+name: Delete an Empty Room
+url: http://localhost:8080/api/v1/rooms/MED-101
+method: DELETE
+order: 4502899919597962

@@ -1,3 +1,8 @@
+**Author:** P.R.S.N.P. De Silva
+**IIT ID:** 20240744
+
+---
+
 # Smart Campus — Sensor & Room Management API
 
 A RESTful API built with **JAX-RS (Jersey)** for managing campus rooms, sensors, and their historical readings as part of the university's "Smart Campus" initiative.

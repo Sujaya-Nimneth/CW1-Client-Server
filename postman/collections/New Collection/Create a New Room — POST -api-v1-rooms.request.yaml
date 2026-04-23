@@ -1,0 +1,15 @@
+$kind: http-request
+name: Create a New Room — POST /api/v1/rooms
+url: http://localhost:8080/api/v1/rooms
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": "MED-101",
+      "name": "Medical Wing Lab",
+      "capacity": 25
+    }
+order: 4418006614808210

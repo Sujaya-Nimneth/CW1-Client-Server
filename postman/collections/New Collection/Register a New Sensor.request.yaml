@@ -1,0 +1,20 @@
+$kind: http-request
+url: http://localhost:8080/api/v1/sensors
+method: POST
+headers:
+  Content-Type: application/json
+queryParams:
+  - key: ""
+    value: ""
+    disabled: true
+body:
+  type: json
+  content: |-
+    {
+      "id": "HUM-001",
+      "type": "Humidity",
+      "status": "ACTIVE",
+      "currentValue": 45.5,
+      "roomId": "ENG-102"
+    }
+order: 4503398364154541

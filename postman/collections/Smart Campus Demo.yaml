@@ -1,0 +1,189 @@
+info:
+  name: Smart Campus Demo
+  description: >-
+    Smart Campus — Sensor & Room Management API.
+    A RESTful API built with JAX-RS (Jersey) for managing campus rooms, sensors,
+    and their historical readings. All 12 demo requests pre-configured.
+  version: 1.0.0
+
+variable:
+  - key: baseUrl
+    value: http://localhost:8080/api/v1
+
+item:
+  # ──────────────────────────────────────────────
+  # FOLDER 1 — Discovery & HATEOAS
+  # ──────────────────────────────────────────────
+  - name: 1 — Discovery & HATEOAS
+    item:
+      - name: "1. Discovery Endpoint"
+        request:
+          method: GET
+          url: "{{baseUrl}}"
+          description: >-
+            Returns API metadata and HATEOAS navigation links to all resource collections.
+            Demonstrates: HATEOAS / self-discoverability (Richardson Maturity Level 3).
+
+  # ──────────────────────────────────────────────
+  # FOLDER 2 — Room Management
+  # ──────────────────────────────────────────────
+  - name: 2 — Room Management
+    item:
+      - name: "2. List All Rooms"
+        request:
+          method: GET
+          url: "{{baseUrl}}/rooms"
+          description: >-
+            Returns all rooms with full details (name, capacity, sensorIds).
+            Demonstrates: Returning full objects vs IDs, pre-loaded sample data.
+
+      - name: "3. Create a New Room"
+        request:
+          method: POST
+          url: "{{baseUrl}}/rooms"
+          header:
+            - key: Content-Type
+              value: application/json
+          body:
+            mode: raw
+            raw: |-
+              {
+                  "id": "MED-101",
+                  "name": "Medical Wing Lab",
+                  "capacity": 25
+              }
+          description: >-
+            Creates a new room resource. Returns 201 Created with Location header.
+            Demonstrates: POST with JSON body, @Consumes annotation.
+
+      - name: "4. Get a Specific Room"
+        request:
+          method: GET
+          url: "{{baseUrl}}/rooms/LIB-301"
+          description: >-
+            Retrieves a specific room by its ID.
+            Demonstrates: @PathParam for resource identification.
+
+  # ──────────────────────────────────────────────
+  # FOLDER 3 — Sensor Operations
+  # ──────────────────────────────────────────────
+  - name: 3 — Sensor Operations
+    item:
+      - name: "5. Register a New Sensor"
+        request:
+          method: POST
+          url: "{{baseUrl}}/sensors"
+          header:
+            - key: Content-Type
+              value: application/json
+          body:
+            mode: raw
+            raw: |-
+              {
+                  "id": "HUM-001",
+                  "type": "Humidity",
+                  "status": "ACTIVE",
+                  "currentValue": 45.0,
+                  "roomId": "ENG-102"
+              }
+          description: >-
+            Registers a new sensor and links it to an existing room.
+            Demonstrates: Cross-resource linking (sensor → room), automatic sensorIds update.
+
+      - name: "6. List Sensors Filtered by Type"
+        request:
+          method: GET
+          url: "{{baseUrl}}/sensors?type=Temperature"
+          description: >-
+            Returns sensors filtered by type using a query parameter.
+            Demonstrates: @QueryParam filtering vs path-based filtering.
+
+  # ──────────────────────────────────────────────
+  # FOLDER 4 — Sensor Readings (Sub-Resource)
+  # ──────────────────────────────────────────────
+  - name: 4 — Sensor Readings (Sub-Resource)
+    item:
+      - name: "7. Post a New Sensor Reading"
+        request:
+          method: POST
+          url: "{{baseUrl}}/sensors/TEMP-001/readings"
+          header:
+            - key: Content-Type
+              value: application/json
+          body:
+            mode: raw
+            raw: |-
+              {
+                  "value": 23.7
+              }
+          description: >-
+            Posts a new reading value to an active sensor.
+            Demonstrates: Sub-resource locator pattern, auto-generated UUID + timestamp.
+
+      - name: "8. Get Sensor Reading History"
+        request:
+          method: GET
+          url: "{{baseUrl}}/sensors/TEMP-001/readings"
+          description: >-
+            Retrieves the full reading history for a specific sensor.
+            Demonstrates: Sub-resource pattern, deep nesting (sensors/{id}/readings).
+
+  # ──────────────────────────────────────────────
+  # FOLDER 5 — Deletion & Error Scenarios
+  # ──────────────────────────────────────────────
+  - name: 5 — Deletion & Error Scenarios
+    item:
+      - name: "9. Delete an Empty Room (204 Success)"
+        request:
+          method: DELETE
+          url: "{{baseUrl}}/rooms/MED-101"
+          description: >-
+            Deletes a room with no sensors assigned. Returns 204 No Content.
+            Demonstrates: Successful DELETE, idempotency (repeat → 404).
+            ⚠️ Run request #3 (Create MED-101) before this one!
+
+      - name: "10. Delete Room with Sensors (409 Conflict)"
+        request:
+          method: DELETE
+          url: "{{baseUrl}}/rooms/LIB-301"
+          description: >-
+            Attempts to delete a room that still has sensors linked. Returns 409 Conflict.
+            Demonstrates: RoomNotEmptyException → RoomNotEmptyExceptionMapper → 409.
+
+      - name: "11. Register Sensor with Invalid roomId (422)"
+        request:
+          method: POST
+          url: "{{baseUrl}}/sensors"
+          header:
+            - key: Content-Type
+              value: application/json
+          body:
+            mode: raw
+            raw: |-
+              {
+                  "id": "FAKE-001",
+                  "type": "Temperature",
+                  "status": "ACTIVE",
+                  "currentValue": 0,
+                  "roomId": "NONEXISTENT"
+              }
+          description: >-
+            Attempts to register a sensor referencing a non-existent roomId. Returns 422.
+            Demonstrates: LinkedResourceNotFoundException → 422 Unprocessable Entity.
+
+      - name: "12. Post Reading to MAINTENANCE Sensor (403)"
+        request:
+          method: POST
+          url: "{{baseUrl}}/sensors/TEMP-002/readings"
+          header:
+            - key: Content-Type
+              value: application/json
+          body:
+            mode: raw
+            raw: |-
+              {
+                  "value": 19.5
+              }
+          description: >-
+            Attempts to post a reading to a sensor in MAINTENANCE status. Returns 403.
+            Demonstrates: SensorUnavailableException → SensorUnavailableExceptionMapper → 403.
